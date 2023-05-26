@@ -1,7 +1,12 @@
-from classes import Player, Chest
+
+from models.chest import Chest
+from models.player import Player
+from models.wall import Wall
+
+from coordinates import move_player, make_wall_coordinates_list
 import constants
 import pygame
-from sprites import add_walls_to_all_sprites
+
 
 
 if __name__ == "__main__":
@@ -12,14 +17,13 @@ if __name__ == "__main__":
     clock = pygame.time.Clock() 
     all_sprites = pygame.sprite.Group()
 
-    player = Player()
-    chest = Chest()
-    add_walls_to_all_sprites(all_sprites)
-    
+    player = Player(int(constants.WIDTH / 2), int(constants.HEIGHT / 2))
+    chest = Chest(100, 100)
+    walls = pygame.sprite.Group([Wall(x, y) for (x, y) in make_wall_coordinates_list()])
+
     all_sprites.add(player)
     all_sprites.add(chest)
-
-    print(f"{type(all_sprites) = }")
+    all_sprites.add(walls)
 
     running = True 
 
@@ -27,10 +31,13 @@ if __name__ == "__main__":
         for event in pygame.event.get(): 
             if event.type == pygame.QUIT: 
                 running = False 
- 
-        all_sprites.update() 
+        
+        all_sprites.update()    
         screen.fill("purple")
         all_sprites.draw(screen)
+
+        if not player.rect.colliderect(chest.rect):
+            move_player(player, walls)
         pygame.display.flip() 
 
         clock.tick(60)

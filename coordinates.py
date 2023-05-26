@@ -1,16 +1,6 @@
 import constants
-
-
-
-def make_step_back_for_x_or_y(coord: float, dimention: int) -> float:
-    result = coord - constants.STEP*constants.dt
-    return result if result > dimention else coord
-
-
-
-def make_step_forwafd_for_x_or_y(coord: float, dimention: int) -> float:
-    result = coord + constants.STEP*constants.dt
-    return result if result < dimention - 20 else coord
+import models
+import pygame
 
 
 def make_wall_coordinates_list() -> list[list[int]]:
@@ -32,3 +22,19 @@ def make_wall_coordinates_list() -> list[list[int]]:
         wall_coordinates_list.append([constants.WIDTH - constants.WALL_SIZE, y])
                   
     return wall_coordinates_list
+
+
+def move_player(player: models.player.Player, walls: models.wall.Wall) -> None:
+    previous_player_topleft = player.rect.topleft
+    keys = pygame.key.get_pressed()
+    if keys[pygame.K_LEFT]:
+        player.rect = player.rect.move(-constants.STEP, 0)
+    if keys[pygame.K_RIGHT]:
+        player.rect = player.rect.move(constants.STEP, 0)
+    if keys[pygame.K_UP]:
+        player.rect = player.rect.move(0, -constants.STEP)
+    if keys[pygame.K_DOWN]:
+        player.rect = player.rect.move(0, constants.STEP)
+    
+    if pygame.sprite.spritecollide(player, walls, dokill=False):
+        player.rect.topleft = previous_player_topleft
